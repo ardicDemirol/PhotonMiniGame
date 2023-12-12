@@ -25,12 +25,13 @@ public class ServerManager : MonoBehaviourPunCallbacks
     {       
 
         Debug.Log("Lobiye bağlanıldı.");
-        PhotonNetwork.NickName = "OLCAY";
+        PhotonNetwork.NickName = "Ardic";
         PhotonNetwork.JoinOrCreateRoom("oda isim", new RoomOptions { MaxPlayers = 2, IsOpen = true, IsVisible = true }, TypedLobby.Default);
     }  
     public override void OnJoinedRoom()
     {
         Debug.Log("Odaya Girildi."); 
+        PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         
     }
     public override void OnLeftLobby()
