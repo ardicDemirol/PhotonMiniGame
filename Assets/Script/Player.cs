@@ -1,22 +1,57 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using TMPro;
+using UnityEngine.UI;
+
 
 public class Player : MonoBehaviour
 {
-    public GameObject parctefek;
-    PhotonView photonView;
+    private PhotonView _photonView;
+    private Animator _animator;
+
+    public TextMeshProUGUI UsernameText;
+    public TextMeshProUGUI HealthText;
+
+    public Slider HealthSlider;
+
+    public GameObject FirePoint;
+
+
+    public static readonly int IsRotateID = Animator.StringToHash("RotatePlayer");
+
+    private float _health;
+
 
     private void Awake()
     {
-        photonView = GetComponent<PhotonView>();
+        _health = 100f;
+        HealthText.text = _health.ToString();
+        _animator = GetComponent<Animator>();
+        _photonView = GetComponent<PhotonView>();
+        UsernameText.text = _photonView.Owner.NickName;
     }
 
 
     void Update()
     {
-        if (!photonView.IsMine) return;
+        if (!_photonView.IsMine) return;
 
         PlayerMoveController();
+        AnimatorController();
+    }
+
+   
+
+    private void AnimatorController()
+    {
+        if(Input.GetKey(KeyCode.B))
+        {
+            _animator.SetBool(IsRotateID, true);
+        }
+        else
+        {
+            _animator.SetBool(IsRotateID, false);
+        }
     }
 
     private void PlayerMoveController()
@@ -46,9 +81,26 @@ public class Player : MonoBehaviour
 
                 Debug.Log(hit.transform.gameObject.tag);
 
-            PhotonNetwork.Instantiate("FireVFX", transform.position, Quaternion.Euler(-90f,transform.eulerAngles.y,0f));
+            PhotonNetwork.Instantiate("FireVFX", FirePoint.transform.position, Quaternion.Euler(-90f,transform.eulerAngles.y,0f));
+
+            //if (hit.transform.gameObject.TryGetComponent(out PhotonView photonView))
+            //{
+            //    photonView.RPC("TakeDamage", RpcTarget.All, 10);
+            //}
+
+            //hit.transform.gameObject.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, 10);
 
         }
+    }
+
+    [PunRPC]
+    void TakeDamage(int amount)
+    {
+        _health -= amount;
+        HealthText.text = _health.ToString();
+        HealthSlider.value = _health;
+
+        if (_health <= 0) PhotonNetwork.Destroy(gameObject);
     }
 
 

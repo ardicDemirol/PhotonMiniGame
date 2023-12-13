@@ -2,22 +2,26 @@ using UnityEngine;
 using Photon.Pun;
 using System.Collections;
 
-public class Particle : MonoBehaviour
+public class Particle : MonoBehaviourPunCallbacks
 {
-    private WaitForSeconds waitTime = new(1f);
+    private readonly WaitForSeconds _waitTime = new(1f);
     void Start()
     {
         StartCoroutine(DestroyParticle());
     }
-
-    void Update()
-    {
-        
-    }
-
     IEnumerator DestroyParticle()
     {
-        yield return waitTime;
+        yield return _waitTime;
         PhotonNetwork.Destroy(gameObject);
     }
+
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            other.transform.gameObject.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, 10);
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
 }

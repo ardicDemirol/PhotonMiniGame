@@ -5,15 +5,20 @@ using Photon.Realtime;
 
 public class ServerManager : MonoBehaviourPunCallbacks
 {
-    public TextMeshProUGUI logText;
+    public TextMeshProUGUI LogText;
+    public TMP_InputField RoomName;
+    public TMP_InputField Username;
+    public GameObject LogInPanel;
+    public GameObject PlayerListPanel;
+
     void Start()
-    {        
+    {
         PhotonNetwork.ConnectUsingSettings();
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        Debug.Log("Bağlantı koptu");      
+        Debug.Log("Bağlantı koptu");
     }
     public override void OnConnectedToMaster()
     {
@@ -22,17 +27,16 @@ public class ServerManager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinLobby();
     }
     public override void OnJoinedLobby()
-    {       
+    {
 
         Debug.Log("Lobiye bağlanıldı.");
-        PhotonNetwork.NickName = "Ardic";
-        PhotonNetwork.JoinOrCreateRoom("oda isim", new RoomOptions { MaxPlayers = 2, IsOpen = true, IsVisible = true }, TypedLobby.Default);
-    }  
+    }
     public override void OnJoinedRoom()
     {
-        Debug.Log("Odaya Girildi."); 
+        Debug.Log("Odaya Girildi.");
+        LogInPanel.SetActive(false);
         PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
-        
+
     }
     public override void OnLeftLobby()
     {
@@ -41,13 +45,13 @@ public class ServerManager : MonoBehaviourPunCallbacks
     }
     public override void OnLeftRoom()
     {
-        Debug.Log("Odadan Çıkıldı.");      
-    }  
+        Debug.Log("Odadan Çıkıldı.");
+    }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.Log("Odaya girilemedi." + message + " - " + returnCode);   
-    
+        Debug.Log("Odaya girilemedi." + message + " - " + returnCode);
+
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
@@ -59,5 +63,44 @@ public class ServerManager : MonoBehaviourPunCallbacks
         Debug.Log("Oda oluşturulamadı." + message + " - " + returnCode);
     }
 
-  
+    public void CreateAndJoinRoom()
+    {
+        PhotonNetwork.NickName = Username.text;
+        PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2, IsOpen = true, IsVisible = true }, TypedLobby.Default);
+
+    }
+
+    public void RandomJoinRoom()
+    {
+        PhotonNetwork.NickName = Username.text;
+        PhotonNetwork.JoinRandomRoom();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.Tab))
+        {
+            PlayerListPanel.SetActive(true);
+            PlayerListPanel.GetComponentInChildren<TextMeshProUGUI>().text = "";
+
+            foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+            {
+                if(player.IsMasterClient)
+                {
+                    PlayerListPanel.GetComponentInChildren<TextMeshProUGUI>().text += player.NickName + " - (Room )\n";
+                }
+                else
+                {
+                    PlayerListPanel.GetComponentInChildren<TextMeshProUGUI>().text += player.NickName + " - \n";
+
+                }
+
+            }
+        }
+        else
+        {
+            PlayerListPanel.SetActive(false);
+        }
+    }
+
 }
