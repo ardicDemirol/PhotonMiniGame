@@ -33,9 +33,21 @@ public class ServerManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedRoom()
     {
-        Debug.Log("Odaya Girildi.");
         LogInPanel.SetActive(false);
-        PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+
+        int left = PhotonNetwork.PlayerList.Length % 2;
+        byte teamIndex;
+        if (left == 1)
+        {
+            teamIndex = 1;
+        }
+        else
+        {
+            teamIndex = 2;
+        }
+
+        GameObject player =  PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
+        player.GetComponent<PhotonView>().RPC("SetTeam",RpcTarget.All,teamIndex);
 
     }
     public override void OnLeftLobby()
@@ -92,9 +104,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
                 else
                 {
                     PlayerListPanel.GetComponentInChildren<TextMeshProUGUI>().text += player.NickName + " - \n";
-
                 }
-
             }
         }
         else

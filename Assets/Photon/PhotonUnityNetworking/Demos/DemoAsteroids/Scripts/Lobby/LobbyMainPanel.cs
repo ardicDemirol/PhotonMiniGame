@@ -118,18 +118,18 @@ namespace Photon.Pun.Demo.Asteroids
 
             foreach (Player p in PhotonNetwork.PlayerList)
             {
-                GameObject entry = Instantiate(PlayerListEntryPrefab);
-                entry.transform.SetParent(InsideRoomPanel.transform);
-                entry.transform.localScale = Vector3.one;
-                entry.GetComponent<PlayerListEntry>().Initialize(p.ActorNumber, p.NickName);
+                //GameObject entry = Instantiate(PlayerListEntryPrefab);
+                //entry.transform.SetParent(InsideRoomPanel.transform);
+                //entry.transform.localScale = Vector3.one;
+                //entry.GetComponent<PlayerListEntry>().Initialize(p.ActorNumber, p.NickName);
 
-                object isPlayerReady;
-                if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
-                {
-                    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool) isPlayerReady);
-                }
+                //object isPlayerReady;
+                //if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
+                //{
+                //    entry.GetComponent<PlayerListEntry>().SetPlayerReady((bool)isPlayerReady);
+                //}
 
-                playerListEntries.Add(p.ActorNumber, entry);
+                //playerListEntries.Add(p.ActorNumber, entry);
             }
 
             StartGameButton.gameObject.SetActive(CheckPlayersReady());

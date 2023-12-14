@@ -21,6 +21,9 @@ public class Particle : MonoBehaviourPunCallbacks
         {
             other.transform.gameObject.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, 10);
             PhotonNetwork.Destroy(gameObject);
+
+            //other.transform.gameObject.GetComponent<PhotonView>().RpcSecure("TakeDamage", RpcTarget.All,true, 10);
+
         }
     }
 
