@@ -620,7 +620,7 @@ namespace Photon.Pun.UtilityScripts
         /// <param name="player">The player to get the team mates of.</param>
         /// <param name="teamMates">The team mates array to fill.</param>
         /// <returns>If successful or not.</returns>
-        public static bool TryGetTeamMates(this Player player, out Player[] teamMates)
+        public static bool TryGetTeamMates(this Player player, Player localPlayer, out Player[] teamMates)
         {
             return PhotonTeamsManager.Instance.TryGetTeamMatesOfPlayer(player, out teamMates);
         }

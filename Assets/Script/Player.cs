@@ -6,8 +6,9 @@ using Photon.Pun.Demo.PunBasics;
 using Photon.Pun.UtilityScripts;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
+using Unity.VisualScripting;
 
-public class Player : MonoBehaviourPunCallbacks
+public class Player : MonoBehaviourPunCallbacks, IPunObservable
 {
     private PhotonView _photonView;
     private Animator _animator;
@@ -32,6 +33,9 @@ public class Player : MonoBehaviourPunCallbacks
 
     private float _health;
 
+    private int sendData;
+    private int receiveData;
+
 
     private void Awake()
     {
@@ -41,8 +45,7 @@ public class Player : MonoBehaviourPunCallbacks
         _photonView = GetComponent<PhotonView>();
         UsernameText.text = _photonView.Owner.NickName;
         _cameraWork = gameObject.GetComponent<CameraWork>();
-
-
+        sendData = 50;
     }
 
     private void Start()
@@ -52,9 +55,27 @@ public class Player : MonoBehaviourPunCallbacks
         //    if(_photonView.IsMine) _cameraWork.OnStartFollowing();
         //}
 
+        PhotonNetwork.LocalPlayer.JoinTeam(1);
         PhotonNetwork.LocalPlayer.AddScore(0);
-
         PhotonNetwork.LocalPlayer.SetCustomProperties(_props);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.Serialize(ref sendData);
+
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else if (stream.IsReading)
+        {
+            receiveData = (int)stream.ReceiveNext();
+
+            transform.position = (Vector3)stream.ReceiveNext();
+            transform.rotation = (Quaternion)stream.ReceiveNext();
+        }
     }
 
     void Update()
@@ -128,9 +149,33 @@ public class Player : MonoBehaviourPunCallbacks
         }
 
 
-        if(Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             Debug.Log(PhotonNetwork.LocalPlayer.GetPhotonTeam().ToString());
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            PhotonNetwork.LocalPlayer.LeaveCurrentTeam();
+            Debug.Log("Team Left");
+            gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
+        }
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            byte teamIndex = (byte)(PhotonNetwork.LocalPlayer.GetPhotonTeam().Code == 1 ? 2 : 1);
+            PhotonNetwork.LocalPlayer.SwitchTeam(teamIndex);
+            Debug.Log("Team Switched");
+            gameObject.GetComponent<MeshRenderer>().material.color = teamIndex == 1 ? Color.blue : Color.red;
+        }
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            bool v = PhotonNetwork.LocalPlayer.TryGetTeamMates(PhotonNetwork.LocalPlayer, out Photon.Realtime.Player[] teamMates);
+
+            foreach (Photon.Realtime.Player player in teamMates)
+            {
+                Debug.Log("Team Mates: " + player.NickName);
+            }
         }
 
     }
@@ -198,9 +243,9 @@ public class Player : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void SetTeam(byte index)
+    private void SetTeam(byte teamIndex)
     {
-        PhotonNetwork.LocalPlayer.JoinTeam(index);
+        PhotonNetwork.LocalPlayer.JoinTeam(teamIndex);
 
     }
 
@@ -210,7 +255,6 @@ public class Player : MonoBehaviourPunCallbacks
         Debug.Log("Order has changed: " + orderNumber);
 
     }
-
 
 
 }

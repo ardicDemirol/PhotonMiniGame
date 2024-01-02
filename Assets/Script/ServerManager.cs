@@ -2,6 +2,7 @@
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
 public class ServerManager : MonoBehaviourPunCallbacks
 {
@@ -35,19 +36,22 @@ public class ServerManager : MonoBehaviourPunCallbacks
     {
         LogInPanel.SetActive(false);
 
-        int left = PhotonNetwork.PlayerList.Length % 2;
+        byte left = (byte)(PhotonNetwork.PlayerList.Length % 2);
         byte teamIndex;
-        if (left == 1)
+        if (left == 1) teamIndex = 1;
+        else teamIndex = 2;
+
+        GameObject playerObject;
+        if (teamIndex == 1)
         {
-            teamIndex = 1;
+            playerObject = PhotonNetwork.Instantiate("PlayerBlue", Vector3.zero, Quaternion.identity);
         }
         else
         {
-            teamIndex = 2;
+            playerObject = PhotonNetwork.Instantiate("PlayerRed", Vector3.zero, Quaternion.identity);
         }
 
-        GameObject player =  PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
-        player.GetComponent<PhotonView>().RPC("SetTeam",RpcTarget.All,teamIndex);
+        playerObject.GetComponent<PhotonView>().RPC("SetTeam", RpcTarget.All, teamIndex);
 
     }
     public override void OnLeftLobby()
@@ -78,7 +82,7 @@ public class ServerManager : MonoBehaviourPunCallbacks
     public void CreateAndJoinRoom()
     {
         PhotonNetwork.NickName = Username.text;
-        PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2, IsOpen = true, IsVisible = true }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 3, IsOpen = true, IsVisible = true }, TypedLobby.Default);
 
     }
 

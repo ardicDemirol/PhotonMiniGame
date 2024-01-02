@@ -853,7 +853,7 @@ GameObject:
   - component: {fileID: 767190411773626778}
   - component: {fileID: 729752480701349895}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerRed
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -905,7 +905,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f0a6a86e908f6204ab518387a784ed36, type: 2}
+  - {fileID: 2100000, guid: b8c39ec154a6919469784b355d8daa08, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
